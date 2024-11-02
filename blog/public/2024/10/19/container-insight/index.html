@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="“首因效应“，是指人对人或事物的第一次印象对今后续认知的影响，虽然这些第一印象并非总是正确的，但却是最鲜明、最牢固的，并且决定着对于其认知的进程。软件分发(Software Distribution)是软件开发的最后一个环节，也是终端用户(End Users)使用软件的第一个环节，对于用户体验有关键影响，很大程度决定着用户对于软件的长期认知。易用性、易获得性以及内容和服务是否与用户所期望的一致，极">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Does Size Matters? From Alpine to Distroless, thoughts on OS distribution.">
+<meta property="og:url" content="https://zhengzhenyu.github.com/2024/10/19/container-insight/index.html">
+<meta property="og:site_name" content="Kevin&#39;s Personal Blog">
+<meta property="og:description" content="“首因效应“，是指人对人或事物的第一次印象对今后续认知的影响，虽然这些第一印象并非总是正确的，但却是最鲜明、最牢固的，并且决定着对于其认知的进程。软件分发(Software Distribution)是软件开发的最后一个环节，也是终端用户(End Users)使用软件的第一个环节，对于用户体验有关键影响，很大程度决定着用户对于软件的长期认知。易用性、易获得性以及内容和服务是否与用户所期望的一致，极">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zhengzhenyu.github.com/2024/10/19/container-insight/docker-statistic.png">
+<meta property="og:image" content="https://zhengzhenyu.github.com/2024/10/19/container-insight/image-types.png">
+<meta property="article:published_time" content="2024-10-19T12:44:38.000Z">
+<meta property="article:modified_time" content="2024-10-19T14:28:43.634Z">
+<meta property="article:author" content="Zheng Zhenyu">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhengzhenyu.github.com/2024/10/19/container-insight/docker-statistic.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Does Size Matters? From Alpine to Distroless, thoughts on OS distribution.</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/zhengzhenyu">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2024/11/02/opea-insight/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://zhengzhenyu.github.com/2024/10/19/container-insight/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&text=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&is_video=false&description=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution.&body=Check out this article: https://zhengzhenyu.github.com/2024/10/19/container-insight/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&name=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution.&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://zhengzhenyu.github.com/2024/10/19/container-insight/&t=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%B9%E5%99%A8%E5%8C%96%E4%B8%8E%E5%AE%B9%E5%99%A8%E5%88%86%E5%8F%91"><span class="toc-number">1.</span> <span class="toc-text">容器化与容器分发</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.0.1.</span> <span class="toc-text">是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E4%BB%80%E4%B9%88%E4%BB%B7%E5%80%BC%EF%BC%9F"><span class="toc-number">1.0.2.</span> <span class="toc-text">有什么价值？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%8E%E4%B9%88%E5%88%86%E5%8F%91%EF%BC%9F"><span class="toc-number">1.0.3.</span> <span class="toc-text">怎么分发？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%93%AA%E4%BA%9B%E7%B1%BB%E5%9E%8B%EF%BC%9F"><span class="toc-number">1.0.4.</span> <span class="toc-text">有哪些类型？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%AA%E4%BA%9B%E9%95%9C%E5%83%8F%E7%94%A8%E6%88%B7%E9%87%8F%E6%9C%80%E5%A4%A7%EF%BC%9F"><span class="toc-number">1.0.5.</span> <span class="toc-text">哪些镜像用户量最大？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Alpine-Linux"><span class="toc-number">2.</span> <span class="toc-text">Alpine Linux</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Does Size Matters? From Alpine to Distroless, thoughts on OS distribution.
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Zheng Zhenyu</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-10-19T12:44:38.000Z" class="dt-published" itemprop="datePublished">2024-10-19</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>“首因效应“，是指人对人或事物的第一次印象对今后续认知的影响，虽然这些第一印象并非总是正确的，但却是最鲜明、最牢固的，并且决定着对于其认知的进程。软件分发(Software Distribution)是软件开发的最后一个环节，也是终端用户(End Users)使用软件的第一个环节，对于用户体验有关键影响，很大程度决定着用户对于软件的长期认知。易用性、易获得性以及内容和服务是否与用户所期望的一致，极大的影响着用户对于软件的整体印象。</p>
+<p>“易用性、易获得性以及内容和服务是否与用户所期望的一致”，这三条需求其实需要由两个角色共同承担：1）产品经理，能够准确的理解用户需求，并把用户需求转化为技术需求，确保最终开发出来的内容和服务符合用户期望；2）开发人员，准确开发实现需求，完整验证，通过技术手段确保易用性与已获得性。</p>
+<p>先从技术视角来看一看目前数据中心用户是如何使用软件的。</p>
+<h1 id="容器化与容器分发"><a href="#容器化与容器分发" class="headerlink" title="容器化与容器分发"></a>容器化与容器分发</h1><h3 id="是什么？"><a href="#是什么？" class="headerlink" title="是什么？"></a>是什么？</h3><p>容器化技术是一种将应用程序及其依赖项打包到独立、可移植的容器(Containers)中的技术。‌这些容器可以在任何基础设施上稳定运行(实际上依赖于底层OS的硬件架构支持能力)，具有较高的可移植性和资源效率。‌容器化利用‌Linux的‌<code>Namespaces</code>和‌<code>Cgroups</code>技术对应用程序进程进行隔离和资源限制。<code>Namespaces</code>提供隔离的环境，使得应用进程只能访问其容器内的资源，而<code>Cgroups</code>则限制分配给进程的资源。因此，容器实际上是在宿主机上运行的特殊进程，多个容器共享同一个操作系统内核。</p>
+<h3 id="有什么价值？"><a href="#有什么价值？" class="headerlink" title="有什么价值？"></a>有什么价值？</h3><p>一款软件从开发到测试再到发布和使用，会经手的各种开发人员众多，各个开发人员之间的环境配置不一致会大大降低开发效率和软件质量，开发和测试之间的”在我这跑的好好的，到你那怎么就跑不了“的问题时常发生。容器化将应用程序代码与应用程序运行时所需的相关配置文件、库和依赖项捆绑在一起，因此较好的消除了这一问题。而对于软件用户，尤其是开源软件用户来说，最期望的软件分发方式就是”开箱即用“，本质上与前面介绍的开发与测试之间的故事类似，因此容器化软件和服务分发，已经成为主流。根据<a target="_blank" rel="noopener" href="https://www.forrester.com/press-newsroom/the-state-of-cloud-in-north-america-2022/">Forrester</a>的一份调研报告，2022年已经有超过74%的美国企业将其业务部署在容器中了。尤其是CI&#x2F;CD服务，绝大多数能够容器化的已经都进行了容器化改造，极大的提高了开发效率。</p>
+<h3 id="怎么分发？"><a href="#怎么分发？" class="headerlink" title="怎么分发？"></a>怎么分发？</h3><p>容器化和进程隔离的概念尽管已经诞生了几十年，但直到2013年开源Docker的出现(掐指一算，也已经超过10年了)，才加速了这项技术的采用。作为容器技术的极大推动者，Dokcer官方的容器镜像仓库(Registry)<code>Dockerhub</code>自然也成了容器镜像官方仓库的事实标准。<br><img src="/2024/10/19/container-insight/docker-statistic.png" alt="Dockerhub Statistics"><br>Dockerhub目前承载了超过1400万个容器镜像，月度容器下载量达110亿次，数据相当可怕。尽管还有许多类似的容器镜像分发渠道，如RedHat Quay、Google GCR等，但DockerHub仍是最主流的那一个。</p>
+<h3 id="有哪些类型？"><a href="#有哪些类型？" class="headerlink" title="有哪些类型？"></a>有哪些类型？</h3><p>DockerHub根据镜像质量及镜像发布者情况将DockerHub上的镜像分为四个级别，三个可信(Trusted Contents)内容级别以及一个普通内容级别：<br><img src="/2024/10/19/container-insight/image-types.png" alt="Dockerhub Image Types"></p>
+<ul>
+<li>Docker Official Images: 由Docker官方维护的高质量容器镜像，大多是云原生业务所需的最常用镜像(OS基础镜像、中间件、微服务网关、KV数据库等)，并提供可靠的CVE维护。当前总数171个。</li>
+<li>Docker Verified Publisher: 背后有DockerHub认证的商业公司支持的高质量容器镜像(应用软件本身可以是开源或免费的)，此类镜像约9000个。</li>
+<li>Docker-Sponsored Open Source: DockerHub认可并提供支持的开源项目，这些项目镜像由对应的开源社区或项目提供维护和支持，相较于普通镜像，DockerHub为这些开源社区和项目提供容器镜像的存储和下载流量支持。</li>
+<li>普通镜像：普通的由个人或组织创建的镜像，不享有任何特殊的支持，所能使用的DockerHub存储空间和下载带宽都非常受限。</li>
+</ul>
+<h3 id="哪些镜像用户量最大？"><a href="#哪些镜像用户量最大？" class="headerlink" title="哪些镜像用户量最大？"></a>哪些镜像用户量最大？</h3><p> DockerHub上用户量(下载量)最大的镜像来自于<code>Docker Official Images</code>，或者说只要用量足够大，Docker就会把它收编到<code>Official Images</code>以便保证质量和用户体验。目前前十名的镜像包括：Nginx、Memcached、Busybox、Alpine、Ubuntu、Redis、Postgres、Python、Node.js、http，这些镜像的前五名的周下载量都在1000万以上，后几名也有百万的周下载量。不难看出，都是最为常见的中间件和开发者工具。其中有两个操作系统基础镜像，显得尤为瞩目，<code>Alpine</code>和<code>Ubuntu</code>，其他一些知名的操作系统如<code>Debian</code>和<code>CentOS</code>排名仅在20左右，周下载量也仅有50万左右。<code>Ubuntu</code>自不必说，在开发者中的声望一直很高，那么另一个操作系统镜像<code>Alpine</code>又有什么独到之处，能够和<code>Ubuntu</code>分庭抗礼？</p>
+<p>P.S. <code>Docker Official Images</code>所提供的应用容器镜像所使用的基础系统镜像(Base Image)实际只有两种:1）<code>Alpine Linux</code> 2）<code>Bookworm(Debian 12)</code>，足以见得<code>Alpine</code> 镜像在DockerHub的重要性。</p>
+<h1 id="Alpine-Linux"><a href="#Alpine-Linux" class="headerlink" title="Alpine Linux"></a>Alpine Linux</h1><p>TBA</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/zhengzhenyu">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%B9%E5%99%A8%E5%8C%96%E4%B8%8E%E5%AE%B9%E5%99%A8%E5%88%86%E5%8F%91"><span class="toc-number">1.</span> <span class="toc-text">容器化与容器分发</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.0.1.</span> <span class="toc-text">是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E4%BB%80%E4%B9%88%E4%BB%B7%E5%80%BC%EF%BC%9F"><span class="toc-number">1.0.2.</span> <span class="toc-text">有什么价值？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%8E%E4%B9%88%E5%88%86%E5%8F%91%EF%BC%9F"><span class="toc-number">1.0.3.</span> <span class="toc-text">怎么分发？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%93%AA%E4%BA%9B%E7%B1%BB%E5%9E%8B%EF%BC%9F"><span class="toc-number">1.0.4.</span> <span class="toc-text">有哪些类型？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%AA%E4%BA%9B%E9%95%9C%E5%83%8F%E7%94%A8%E6%88%B7%E9%87%8F%E6%9C%80%E5%A4%A7%EF%BC%9F"><span class="toc-number">1.0.5.</span> <span class="toc-text">哪些镜像用户量最大？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Alpine-Linux"><span class="toc-number">2.</span> <span class="toc-text">Alpine Linux</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://zhengzhenyu.github.com/2024/10/19/container-insight/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&text=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&is_video=false&description=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution.&body=Check out this article: https://zhengzhenyu.github.com/2024/10/19/container-insight/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&title=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://zhengzhenyu.github.com/2024/10/19/container-insight/&name=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution.&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://zhengzhenyu.github.com/2024/10/19/container-insight/&t=Does Size Matters? From Alpine to Distroless, thoughts on OS distribution."><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2024
+    Zheng Zhenyu
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/zhengzhenyu">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
